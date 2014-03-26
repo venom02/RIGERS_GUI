@@ -1,40 +1,42 @@
 package com.rigers.GUI.main;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Composite;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.custom.TableTree;
-import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.DateTime;
-import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 public class InsertData {
 	private static class ContentProvider implements IStructuredContentProvider {
@@ -48,9 +50,14 @@ public class InsertData {
 	}
 
 	protected Shell shlRigers;
-	private Text txtAsd;
+	private Text txtCompartimento;
 	private Text text;
 	private Table table;
+	private Text text_1;
+	private Text text_2;
+	private Text text_3;
+	private Spinner spinnerCompId;
+	private Label lblNewLabel;
 
 	/**
 	 * Launch the application.
@@ -122,7 +129,7 @@ public class InsertData {
 		gl_composite_1.marginHeight = 1;
 		composite_1.setLayout(gl_composite_1);
 		
-		Group grpCompartimento = new Group(composite_1, SWT.NONE);
+		final Group grpCompartimento = new Group(composite_1, SWT.NONE);
 		grpCompartimento.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		grpCompartimento.setText("Compartimento");
 		grpCompartimento.setLayout(new GridLayout(7, false));
@@ -131,28 +138,47 @@ public class InsertData {
 		lblId.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		lblId.setText("ID");
 		
-		Spinner spinner = new Spinner(grpCompartimento, SWT.BORDER);
-		GridData gd_spinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_spinner.widthHint = 20;
-		spinner.setLayoutData(gd_spinner);
+		spinnerCompId = new Spinner(grpCompartimento, SWT.BORDER);
+		GridData gd_spinnerCompId = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_spinnerCompId.widthHint = 20;
+		spinnerCompId.setLayoutData(gd_spinnerCompId);
 		
 		Label lblNome = new Label(grpCompartimento, SWT.NONE);
 		lblNome.setText("Nome");
 		
-		txtAsd = new Text(grpCompartimento, SWT.BORDER);
-		GridData gd_txtAsd = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_txtAsd.widthHint = 225;
-		txtAsd.setLayoutData(gd_txtAsd);
+		txtCompartimento = new Text(grpCompartimento, SWT.BORDER);
+		GridData gd_txtCompartimento = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_txtCompartimento.widthHint = 225;
+		txtCompartimento.setLayoutData(gd_txtCompartimento);
 		new Label(grpCompartimento, SWT.NONE);
 		
-		Label lblNewLabel = new Label(grpCompartimento, SWT.NONE);
+		lblNewLabel = new Label(grpCompartimento, SWT.NONE);
 		lblNewLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
 		lblNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblNewLabel.setText("OK");
 		
-		Button btnInsert = new Button(grpCompartimento, SWT.NONE);
-		btnInsert.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		btnInsert.setText("INSERT");
+		
+		final int RANGE = 20;
+		final List<Integer> sack = new ArrayList<>(RANGE);
+		final ToolTip toolTip = new ToolTip(shlRigers, SWT.BALLOON | SWT.ICON_WARNING);
+		
+		Button btnInsertComp = new Button(grpCompartimento, SWT.NONE);
+		btnInsertComp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				if(!txtCompartimento.getText().isEmpty()){
+					int val = Integer.parseInt(spinnerCompId.getText());
+					lblNewLabel.setText("OK");
+					lblNewLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+					System.out.println("Comp ID:"+ spinnerCompId.getText()+"\t "+txtCompartimento.getText());
+				}
+				
+				
+			}
+		});
+		btnInsertComp.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnInsertComp.setText("INSERT");
 		
 		Group grpEdificio_1 = new Group(composite_1, SWT.NONE);
 		grpEdificio_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -163,6 +189,9 @@ public class InsertData {
 		lblId_1.setText("ID");
 		
 		Spinner spinner_1 = new Spinner(grpEdificio_1, SWT.BORDER);
+		GridData gd_spinner_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_spinner_1.widthHint = 20;
+		spinner_1.setLayoutData(gd_spinner_1);
 		
 		Label lblCompartimento = new Label(grpEdificio_1, SWT.NONE);
 		lblCompartimento.setText("Compartimento");
@@ -204,7 +233,9 @@ public class InsertData {
 		lblEdificio_2.setText("Edificio");
 		
 		Combo combo_5 = new Combo(grpLettura, SWT.NONE);
-		combo_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		GridData gd_combo_5 = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gd_combo_5.widthHint = 100;
+		combo_5.setLayoutData(gd_combo_5);
 		
 		Label lblDispositivo_1 = new Label(grpLettura, SWT.NONE);
 		lblDispositivo_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -213,7 +244,7 @@ public class InsertData {
 		Combo combo_6 = new Combo(grpLettura, SWT.NONE);
 		combo_6.setItems(new String[] {"Meter Acqua", "Meter Elettrico", "Meter Gas", "Meter Termie", "Meter Ripartitore Calore", "Meter Sonde"});
 		combo_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		combo_6.setText("Meter Acqua\r\n");
+		
 		
 		Label lblData = new Label(grpLettura, SWT.NONE);
 		lblData.setText("Data:");
@@ -224,30 +255,106 @@ public class InsertData {
 		new Label(grpLettura, SWT.NONE);
 		new Label(grpLettura, SWT.NONE);
 		
-		Composite composite_3 = new Composite(composite_1, SWT.NONE);
-		composite_3.setLayout(new StackLayout());
-		composite_3.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		Composite compositeDevices = new Composite(composite_1, SWT.NONE);
+		compositeDevices.setLayout(new StackLayout());
+		compositeDevices.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
-		Composite blankcomp = new Composite(composite_3, SWT.NONE);
+		Composite blankcomp = new Composite(compositeDevices, SWT.NONE);
 		
-		Group grpMeterAcqua = new Group(composite_3, SWT.NONE);
+		Group grpMeterAcqua = new Group(compositeDevices, SWT.NONE);
 		grpMeterAcqua.setText("Meter Acqua");
+		grpMeterAcqua.setLayout(new GridLayout(6, false));
+		new Label(grpMeterAcqua, SWT.NONE);
 		
-		Group grpMeterLuce = new Group(composite_3, SWT.NONE);
+		Label lblCurrentReadoutValue = new Label(grpMeterAcqua, SWT.NONE);
+		lblCurrentReadoutValue.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblCurrentReadoutValue.setText("Current Readout Value");
+		
+		text_1 = new Text(grpMeterAcqua, SWT.BORDER);
+		GridData gd_text_1 = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gd_text_1.widthHint = 150;
+		text_1.setLayoutData(gd_text_1);
+		
+		Label lblDal = new Label(grpMeterAcqua, SWT.NONE);
+		lblDal.setText("dal");
+		new Label(grpMeterAcqua, SWT.NONE);
+		
+		Label lblPeriodicReadoutValue = new Label(grpMeterAcqua, SWT.NONE);
+		lblPeriodicReadoutValue.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblPeriodicReadoutValue.setText("Periodic Readout Value");
+		
+		text_2 = new Text(grpMeterAcqua, SWT.BORDER);
+		text_2.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		
+		Label lblDal_1 = new Label(grpMeterAcqua, SWT.NONE);
+		lblDal_1.setText("dal");
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		
+		Label lblPeriodicReadingDate = new Label(grpMeterAcqua, SWT.NONE);
+		lblPeriodicReadingDate.setText("Periodic Reading Date");
+		
+		DateTime dateTime = new DateTime(grpMeterAcqua, SWT.BORDER);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		new Label(grpMeterAcqua, SWT.NONE);
+		
+		Label lblOk_1 = new Label(grpMeterAcqua, SWT.NONE);
+		lblOk_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		lblOk_1.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+		lblOk_1.setText("OK");
+		new Label(grpMeterAcqua, SWT.NONE);
+		
+		Button btnInsert_2 = new Button(grpMeterAcqua, SWT.NONE);
+		btnInsert_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnInsert_2.setText("INSERT");
+		new Label(grpMeterAcqua, SWT.NONE);
+		
+		Group grpMeterLuce = new Group(compositeDevices, SWT.NONE);
 		grpMeterLuce.setText("Meter Elettrico");
 		
-		Group grpMeterRipartitoreCaldaia = new Group(composite_3, SWT.NONE);
+		Group grpMeterRipartitoreCaldaia = new Group(compositeDevices, SWT.NONE);
 		grpMeterRipartitoreCaldaia.setText("Meter Ripartitore Caldaia");
+		grpMeterRipartitoreCaldaia.setLayout(new GridLayout(4, false));
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
 		
-		Group grpMeterGas = new Group(composite_3, SWT.NONE);
+		Label lblUnitConsumo = new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		lblUnitConsumo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblUnitConsumo.setText("Unità Consumo");
+		
+		text_3 = new Text(grpMeterRipartitoreCaldaia, SWT.BORDER);
+		text_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		
+		Label lblOk_2 = new Label(grpMeterRipartitoreCaldaia, SWT.NONE);
+		lblOk_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		lblOk_2.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+		lblOk_2.setText("OK");
+		
+		Button btnInsert_3 = new Button(grpMeterRipartitoreCaldaia, SWT.NONE);
+		btnInsert_3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnInsert_3.setText("INSERT");
+		
+		Group grpMeterGas = new Group(compositeDevices, SWT.NONE);
 		grpMeterGas.setText("Meter Gas");
 		
-		Group grpMeterSonde = new Group(composite_3, SWT.NONE);
+		Group grpMeterSonde = new Group(compositeDevices, SWT.NONE);
 		grpMeterSonde.setText("Meter Sonde");
 		
-		Group grpMeterTermie = new Group(composite_3, SWT.NONE);
+		Group grpMeterTermie = new Group(compositeDevices, SWT.NONE);
 		grpMeterTermie.setText("Meter Termie");
-		composite_3.setTabList(new Control[]{grpMeterAcqua, grpMeterLuce, grpMeterGas, grpMeterTermie, grpMeterRipartitoreCaldaia, grpMeterSonde});
+		compositeDevices.setTabList(new Control[]{grpMeterAcqua, grpMeterLuce, grpMeterGas, grpMeterTermie, grpMeterRipartitoreCaldaia, grpMeterSonde});
 		
 		
 		TabItem tbtmViewData_1 = new TabItem(tabFolder, SWT.NONE);
